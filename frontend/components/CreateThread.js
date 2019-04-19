@@ -28,8 +28,9 @@ class CreateThread extends Component {
                         e.preventDefault()
                         const res = await createThread()
                         Router.push({
-                            pathname: '/'
-                        })
+                            pathname: '/thread',
+                            query: { id: res.data.createThread.id }
+                        }).then(() => location.reload())
                     }}
                 >
                 <Error error={error} /> 

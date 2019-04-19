@@ -41,20 +41,9 @@ const Mutations = {
     //     }, info)
     // },
 
-    // async deleteItem(parent, args, ctx, info) {
-    //     const where = { id: args.id }
-    //     // find the item
-    //     const item = await ctx.db.query.item({where}, `{id title user { id }}`)
-    //     // check if they own that item, on have the permission
-    //     const ownsItem = item.user.id === ctx.request.userId
-    //     const hasPermissions = ctx.request.user.permissions.some(permission => ['ADMIN','ITEMDELETE'].includes(permission))  // some => 一つでもtrueならtrue
-    //     if(!ownsItem && !hasPermissions) {
-    //         throw new Error("You don't have permission to do that!")
-    //     }
-        
-    //     // delete it    
-    //     return ctx.db.mutation.deleteItem({ where }, info)
-    // },
+
+
+    
 
     async signup(parent, args, ctx, info) {
         // emailは全部小文字にした方が色々と都合がいいらしい
@@ -66,6 +55,7 @@ const Mutations = {
             data: {
                 ...args,
                 password,
+                permission: "USER",
             }
         }, info)
         // // create jwt token
@@ -83,6 +73,7 @@ const Mutations = {
         if(!ctx.request.userId){
             throw new Error('You must be logged in to do that!')
         }
+
         const thread = await ctx.db.mutation.createThread({
             data:{
                 author: {
@@ -90,34 +81,161 @@ const Mutations = {
                         id: ctx.request.userId
                     }
                 },
-                ...args
+                ...args,
             }
         }, info)
         return thread
-    }
+    },
 
-    // async signin( parent, { email, password }, ctx, info) {
-    //     // check if there is a user with that email
-    //     const user = await ctx.db.query.user({ where: { email }})
-    //     if(!user) throw new Error(`No such User found for email ${email}`)
-    //     // check if their password is correct
-    //     const valid = await bcrypt.compare(password, user.password)
-    //     if(!valid) throw new Error('Invalid Password!')
-    //     // generate the jwt token
-    //     const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET)
-    //     // set the cookie with token
-    //     ctx.response.cookie('token', token, {
-    //         httpOnly: true,
-    //         maxAge: 1000 * 60 * 60 * 24 * 365,  // 1 year cookie
-    //     })
-    //     // return the user
-    //     return user
-    // },
+    async updateThread(parent, args, ctx, info) {
+        const where = { id: args.id }
+        // find the thread
+        const thread = await ctx.db.query.thread({where}, `{id author { id }}`)
+        // check if they own that thread, on have the permission
+        const ownsThread = thread.author.id === ctx.request.userId
+        const hasPermission = ctx.request.user.permission === 'ADMIN'
+        if(!ownsThread && !hasPermission) {
+            throw new Error("You don't have permission to do that!")
+        }
 
-    // signout(parent, args, ctx, info) {
-    //     ctx.response.clearCookie('token')
-    //     return { message: 'Goodbye!'}
-    // },
+        // first take a copy of the updates
+        const updates = { ...args }
+        //remove the ID from the updates (idはupdateしたくないので)
+        delete updates.id
+        // run the update method
+        return ctx.db.mutation.updateThread({
+            data: updates,
+            where: {
+                id: args.id
+            }
+        }, info)
+    },
+
+    async deleteThread(parent, args, ctx, info) {       
+        const where = { id: args.id }
+        // find the thread
+        const thread = await ctx.db.query.thread({where}, `{id author { id }}`)
+        // check if they own that thread, on have the permission
+        const ownsThread = thread.author.id === ctx.request.userId
+        const hasPermission = ctx.request.user.permission === 'ADMIN'
+        if(!ownsThread && !hasPermission) {
+            throw new Error("You don't have permission to do that!")
+        }
+        // delete it
+        return ctx.db.mutation.deleteThread({ where }, info)
+    },
+
+    async createComment(parent, args, ctx, info) {
+        if(!ctx.request.userId){
+            throw new Error('You must be logged in to do that!')
+        }
+        const comment = await ctx.db.mutation.createComment({
+            data:{
+                author: {
+                    connect: {
+                        id: ctx.request.userId
+                    }
+                },
+                thread: {
+                    connect: {
+                        id: args.thread
+                    }
+                },
+                text: args.text,
+            }
+        }, info)
+        return comment
+    },
+
+    async deleteComment(parent, args, ctx, info) {
+        const where = { id: args.id }
+        // find the comment
+        const comment = await ctx.db.query.comment({where}, `{id author { id }}`)
+        // check if they own that comment, on have the permission
+        const ownsComment = comment.author.id === ctx.request.userId
+        const hasPermission = ctx.request.user.permission === 'ADMIN'
+        if(!ownsComment && !hasPermission) {
+            throw new Error("You don't have permission to do that!")
+        }
+        // delete it
+        return ctx.db.mutation.deleteComment({ where }, info)
+    },
+
+
+    async signin( parent, { email, password }, ctx, info) {
+        // check if there is a user with that email
+        const user = await ctx.db.query.user({ where: { email }})
+        if(!user) throw new Error(`No such User found for email ${email}`)
+        // check if their password is correct
+        const valid = await bcrypt.compare(password, user.password)
+        if(!valid) throw new Error('Invalid Password!')
+        // generate the jwt token
+        const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET)
+        // set the cookie with token
+        ctx.response.cookie('token', token, {
+            httpOnly: true,
+            maxAge: 1000 * 60 * 60 * 24 * 365,  // 1 year cookie
+        })
+        // return the user
+        return user
+    },
+
+    signout(parent, args, ctx, info) {
+        ctx.response.clearCookie('token')
+        return { message: 'Goodbye!'}
+    },
+
+    async checkThreadPermission(parent, args, ctx, info){
+        // find the thread
+        const where = { id: args.id }
+        const thread = await ctx.db.query.thread({where}, `{id author { id }}`)
+        // check if they own that thread, on have the permission
+        const ownsThread = thread.author.id === ctx.request.userId
+        const hasPermission = ctx.request.user.permission === 'ADMIN'
+        if(!ownsThread && !hasPermission) {
+            throw new Error("You don't have permission to do that!")
+        }
+        return { message: 'OK, you have permisssssssioooooon!'}
+    },
+
+    async createUpvote(parent, args, ctx, info) {
+        if(!ctx.request.userId){
+            throw new Error('You must be logged in to do that!')
+        }
+        const upvote = await ctx.db.mutation.createUpvote({
+            data:{
+                author: {
+                    connect: {
+                        id: ctx.request.userId
+                    }
+                },
+                Comment: {
+                    connect: {
+                        id: args.commentId
+                    }
+                },
+            }
+        }, info)
+        return upvote
+
+        // const where = { id: args.commentId }
+        // const comment = await ctx.db.query.comment({where}, `{ id upvotes{id} thread{id} }`)
+        // return comment
+    },
+
+    async deleteUpvote(parent, args, ctx, info) {
+        const where = { id: args.id }
+        // find the comment
+        // const upvote = await ctx.db.query.upvote({where}, `{id author { id }}`)
+        // // check if they own that comment, on have the permission
+        // const ownsComment = comment.author.id === ctx.request.userId
+        // const hasPermission = ctx.request.user.permission === 'ADMIN'
+        // if(!ownsComment && !hasPermission) {
+        //     throw new Error("You don't have permission to do that!")
+        // }
+        // delete it
+        return ctx.db.mutation.deleteUpvote({ where }, info)
+    },
 
     // async requestReset(parent, args, ctx, info) {
     //     // Check if this is a real user

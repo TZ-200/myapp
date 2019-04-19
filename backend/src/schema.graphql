@@ -5,8 +5,9 @@ type Mutation {
     # updateItem(id: ID!, title: String, description: String, price: Int): Item!
     # deleteItem(id: ID!): Item!
     signup(email: String!, password: String!, name: String!): User!
-    # signin(email: String!, password: String!): User!
-    # signout: SuccessMessage
+    signin(email: String!, password: String!): User!
+    signout: SuccessMessage
+    checkThreadPermission(id: ID!): SuccessMessage
     # requestReset(email: String!): SuccessMessage
     # resetPassword(resetToken: String!, password: String!, confirmPassword: String!): User!
     # updatePermissions(permissions: [Permission], userId: ID!): User
@@ -14,7 +15,12 @@ type Mutation {
     # removeFromCart(id: ID!): CartItem
     # createOrder(token: String!): Order!
     createThread(title: String!, text: String!, image: String): Thread!
-    # createComment(text: String!, thread: ID!): Comment!
+    updateThread(id: ID!, title: String!, text: String!, image: String): Thread!
+    deleteThread(id: ID!): Thread!
+    createComment(text: String!, thread: ID!): Comment!
+    deleteComment(id: ID!): Comment!
+    createUpvote(authorId: ID!, commentId: ID!): Upvote!
+    deleteUpvote(id: ID!): Upvote!
     # upvote(comment: ID!): upvote!
 }
 
@@ -26,14 +32,17 @@ type Query {
     users: [User]!
     # order(id: ID!): Order
     threads(where: ThreadWhereInput): [Thread]!
+    thread(where: ThreadWhereUniqueInput!): Thread
     comments(where: CommentWhereInput): [Comment]!
 }
 
-# Client側に送信してはならない情報（passwordを削除（Redefine））
-type User {
-  id: ID! 
-  email: String! 
-}
+# Client側に送信してはならない情報（password/resetTokenを削除（Redefine））
+# type User {
+#     id: ID!
+#     name: String!
+#     email: String!
+#     permission: Permission
+# }
 
 type SuccessMessage {
     message: String

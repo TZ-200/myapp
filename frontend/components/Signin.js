@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Mutation } from 'react-apollo'
 import Error from './ErrorMessage'
-import { SIGNUP, CURRENT_USER_QUERY } from './GQL'
+import { CURRENT_USER_QUERY, SIGNIN_MUTATION } from './GQL'
 import Router from 'next/router'
 
 
-class Signup extends Component {
+class Signin extends Component {
     state = {
         name: '',
         email: '',
@@ -22,17 +22,17 @@ class Signup extends Component {
     render() {
         return (
             <Mutation
-                mutation={SIGNUP}
+                mutation={SIGNIN_MUTATION}
                 variables={this.state}
                 refetchQueries={[{ query: CURRENT_USER_QUERY }]}
             >
-                {(signup, { error, loading }) => {
+                {(signin, { error, loading }) => {
                     return (
                         <form
                             method="post"   // defaultでGETなので必ずPOSTに（URL履歴にパスワード残っちゃうよ！）
                             onSubmit={ async e => {
                                 e.preventDefault()
-                                await signup()
+                                await signin()
                                 this.setState({ name: '', email: '', password: '' })
                                 Router.push({
                                     pathname: '/'
@@ -43,20 +43,8 @@ class Signup extends Component {
                                 disabled={loading}
                                 aria-busy={loading}
                             >
-                                <h2>Create your Account</h2>
+                                <h2>Sign Into your Account</h2>
                                 <Error error={error}/>
-                                
-                                <label htmlFor="name">
-                                    Name
-                                    <input 
-                                        type="text" 
-                                        name = "name"
-                                        placeholder="name"
-                                        value={this.state.name}
-                                        onChange={this.saveToState}
-                                    />
-                                </label>
-                                
                                 <label htmlFor="email">
                                     Email
                                     <input 
@@ -78,7 +66,7 @@ class Signup extends Component {
                                         onChange={this.saveToState}
                                     />
                                 </label>
-                                <button type="submit">Sign Up!</button>
+                                <button type="submit">Sign In!</button>
                             </fieldset>
                         </form>
                     )           
@@ -88,4 +76,4 @@ class Signup extends Component {
     }
 }
 
-export default Signup;
+export default Signin;

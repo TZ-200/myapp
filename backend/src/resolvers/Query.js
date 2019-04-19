@@ -16,9 +16,9 @@ const Query = {
     users: forwardTo('db'),
     threads: forwardTo('db'),
     comments: forwardTo('db'),
+    thread: forwardTo('db'),
 
     me(parent, args, ctx, info) {
-        console.log('me query!');
         // check if there is a current user id (middlewareでuserIdがrequestに付加されているかチェック)
         if(!ctx.request.userId){
             return null
@@ -30,18 +30,7 @@ const Query = {
         }, info)
     },
 
-    // async users(parent, args, ctx, info){
-    //     // Check if they are logged in
-    //     if(!ctx.request.userId){
-    //         throw new Error('You must be logged in!')
-    //     }
-    //     console.log(ctx.request.user);
-        
-    //     // Check if the user has the permission to query all the users
-    //     hasPermission(ctx.request.user, ['ADMIN', 'PERMISSIONUPDATE'])
-    //     // If they do, query all the users
-    //     return ctx.db.query.users({}, info)
-    // },
+
 
     // async order(parent, args, ctx, info){
     //     // Make sure they are logged in 

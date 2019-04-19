@@ -1,38 +1,49 @@
+enum Permission {
+  ADMIN
+  USER
+  COMMENTUPDATE
+}
+
 type User {
-  id: ID! @unique
+  id: ID! @unique @id
   name: String!
   email: String! @unique
   password: String!
   description: String
   image: String
-  Comments: [Comment!]
-  Threads: [Thread!]
-  Upvotes: [Upvote!]
+  Comments: [Comment!] @relation(name: "CommentToUser", onDelete: CASCADE)
+  Threads: [Thread!] @relation(name: "ThreadToUser", onDelete: CASCADE)
+  Upvotes: [Upvote!] @relation(name: "UpvoteToUser", onDelete: CASCADE)
+  permission: Permission!
+  updatedAt: DateTime! @updatedAt
+  createdAt: DateTime! @createdAt
 }
 
 type Thread {
-  id: ID! @unique
+  id: ID! @unique @id
   title: String!
   text: String!
   image: String
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  author: User!
-  comments: [Comment!]
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+  author: User! @relation(name: "ThreadToUser", onDelete: SET_NULL)
+  comments: [Comment!] @relation(name: "CommentToThread", onDelete: CASCADE)
 }
 
 type Comment {
-  id: ID! @unique
+  id: ID! @unique @id
   text: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  author: User! 
-  thread: Thread!
-  upvotes: [Upvote!]
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+  author: User! @relation(name: "CommentToUser", onDelete: SET_NULL) 
+  thread: Thread! @relation(name: "CommentToThread", onDelete: SET_NULL)
+  upvotes: [Upvote!] @relation(name: "UpvoteToComment", onDelete: CASCADE)
 }
 
 type Upvote {
-  id: ID! @unique
-  author: User!
-  Comment: Comment!
+  id: ID! @unique @id
+  author: User! @relation(name: "UpvoteToUser", onDelete: SET_NULL)
+  Comment: Comment! @relation(name: "UpvoteToComment", onDelete: SET_NULL)
+  updatedAt: DateTime! @updatedAt
+  createdAt: DateTime! @createdAt
 }

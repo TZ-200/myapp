@@ -1,8 +1,9 @@
+import Threads from '../components/Threads'
 
-const Threads = props => (
+const ThreadsPage = props => (
     <div>
-        threads
+        <Threads/>
     </div>
 )
 
-export default Threads
+export default ThreadsPage
