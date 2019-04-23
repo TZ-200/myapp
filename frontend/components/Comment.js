@@ -33,7 +33,7 @@ class Comment extends Component {
                                         comment={comment} 
                                         userId={me.id}
                                     />
-                                    <DeleteComment commentId={comment.id}/>
+                                    <DeleteComment threadId={this.props.threadId} commentId={comment.id}/>
                                 </React.Fragment>
                             )
                         } else {

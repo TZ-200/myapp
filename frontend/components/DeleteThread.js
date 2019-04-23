@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Mutation } from 'react-apollo'
 import Router from 'next/router'
-import { DELETE_THREAD_MUTATION } from './GQL'
+import { DELETE_THREAD_MUTATION, THREADS_QUERY } from './GQL'
 
 class DeleteThread extends Component {
     render() {
@@ -11,6 +11,11 @@ class DeleteThread extends Component {
                 variables={{
                     id: this.props.id
                 }}
+                refetchQueries={() => {
+                    return[{
+                        query: THREADS_QUERY
+                    }]
+                }}
             >
             {(deleteThread, {error})=>(
                 <button
@@ -18,7 +23,7 @@ class DeleteThread extends Component {
                         if(confirm('Are you sure you want to delete this item?')){
                             deleteThread()
                             .then(() => {
-                                Router.push({ pathname: '/' }).then(() => location.reload())
+                                Router.push({ pathname: '/' })
                             })
                             .catch(err => {
                                 alert(err.message)

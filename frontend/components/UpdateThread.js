@@ -33,6 +33,12 @@ class UpdateThread extends Component {
                         <Mutation 
                             mutation={UPDATE_THREAD_MUTATION}
                             variables={{...this.state, id: this.props.id}}
+                            refetchQueries={() => {
+                                return[{
+                                    query: SINGLE_THREAD_QUERY,
+                                    variables: { id: this.props.id }
+                                }]
+                            }}
                         >
 
                             {(updateThread, { loading, error }) => {
@@ -49,7 +55,7 @@ class UpdateThread extends Component {
                                             Router.push({
                                                 pathname: '/thread',
                                                 query: { id: res.data.updateThread.id }
-                                            }).then(() => location.reload())
+                                            })
                                         }}
                                     >
                                         <Error error={error} /> 

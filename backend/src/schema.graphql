@@ -21,6 +21,7 @@ type Mutation {
     deleteComment(id: ID!): Comment!
     createUpvote(authorId: ID!, commentId: ID!): Upvote!
     deleteUpvote(id: ID!): Upvote!
+    updateUser(name: String, description: String, image: String): User!
     # upvote(comment: ID!): upvote!
 }
 
@@ -31,9 +32,10 @@ type Query {
     me: User  # userIdはjwtから取得するのでargumentはいらない
     users: [User]!
     # order(id: ID!): Order
-    threads(where: ThreadWhereInput): [Thread]!
+    threads(where: ThreadWhereInput, orderBy: ThreadOrderByInput, skip: Int, first: Int): [Thread]!
     thread(where: ThreadWhereUniqueInput!): Thread
     comments(where: CommentWhereInput): [Comment]!
+    threadsConnection(where: ThreadWhereInput): ThreadConnection!
 }
 
 # Client側に送信してはならない情報（password/resetTokenを削除（Redefine））

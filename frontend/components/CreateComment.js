@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Mutation } from 'react-apollo'
-import { CREATE_COMMENT } from './GQL'
+import { CREATE_COMMENT, SINGLE_THREAD_QUERY } from './GQL'
 
 
 class CreateComment extends Component {
@@ -20,6 +20,12 @@ class CreateComment extends Component {
                     text: this.state.comment,
                     thread: this.props.thread
                 }}
+                refetchQueries={() => {
+                    return[{
+                        query: SINGLE_THREAD_QUERY,
+                        variables: { id: this.props.thread }
+                    }]
+                }}
             >
                 {(createComment, { loading, error }) => (
 
@@ -29,7 +35,6 @@ class CreateComment extends Component {
                             e.preventDefault()                            
                             const res = await createComment()
                             this.setState({comment:""})
-                            location.reload();
                         }}
                     >
 

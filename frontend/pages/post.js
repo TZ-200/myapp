@@ -3,7 +3,7 @@ import PleaseSignIn from '../components/PleaseSignin'
 
 const Post = props => (
         <PleaseSignIn>
-                <CreateThread/>
+                <CreateThread  page={parseFloat(props.query.page) || 1}/>
         </PleaseSignIn>
 )
 

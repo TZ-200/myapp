@@ -5,6 +5,13 @@ const { promisify } = require('util')
 const { transport, makeANiceEmail } = require('../mail');
 const { hasPermission } = require('../utils')
 const stripe = require('../stripe')
+const cloudinary = require('cloudinary')
+
+cloudinary.config({ 
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+    api_key: process.env.CLOUDINARY_API_KEY, 
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 const Mutations = {
     // async createItem(parent,args, ctx, info){
@@ -41,6 +48,38 @@ const Mutations = {
     //     }, info)
     // },
 
+    async updateUser(parent, args, ctx, info) {
+        // first take a copy of the updates
+        const updates = { ...args }
+        //remove the ID from the updates (idはupdateしたくないので)
+        delete updates.id        
+
+        // // An image is already uploaded on Cloudinary
+        // // Delete a previous image
+        // if(updates.image){
+        //     // get a current image
+        //     const user = await ctx.db.query.user({
+        //         where: {
+        //             id: ctx.request.userId
+        //         }
+        //     }, `{id image}`)
+        //     const currentImage = user.image
+
+        //     // delete an image from cloudinary
+        //     if(currentImage){
+        //         const public_id = currentImage.split('/')[currentImage.split('/').length - 1][0]
+        //         cloudinary.v2.uploader.destroy('jk0jcce2mr8emh82s4pf');
+        //     }
+        // }
+
+        // run the update method
+        return ctx.db.mutation.updateUser({
+            data: updates,
+            where: {
+                id: ctx.request.userId
+            }
+        }, info)
+    },
 
 
     
@@ -55,6 +94,7 @@ const Mutations = {
             data: {
                 ...args,
                 password,
+                image:"https://res.cloudinary.com/decov9fyl/image/upload/v1555831568/tz_CRUD/khrjk4qi5lexm8bpajp2.jpg",
                 permission: "USER",
             }
         }, info)

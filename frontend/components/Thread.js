@@ -46,7 +46,7 @@ class Thread extends Component {
                                 <CreateComment  thread={this.props.id} />
 
                                 {comments && comments.map(comment => (
-                                    <Comment comment={comment} key={comment.id}/>
+                                    <Comment threadId={this.props.id} comment={comment} key={comment.id}/>
                                 ))}
                                 
                                 </React.Fragment>

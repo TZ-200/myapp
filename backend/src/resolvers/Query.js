@@ -6,7 +6,6 @@ const Query = {
 
     // items: forwardTo('db'), // 特に操作が必要ないので、直接prismaにつっこんでいる
     // item: forwardTo('db'),  // 特に操作が必要ないので、直接prismaにつっこんでいる
-    // itemsConnection: forwardTo('db'),  // 特に操作が必要ないので、直接prismaにつっこんでいる
     // async items(parent, args, ctx, info){
     //     const items = await ctx.db.query.items()
     //     return items
@@ -17,6 +16,7 @@ const Query = {
     threads: forwardTo('db'),
     comments: forwardTo('db'),
     thread: forwardTo('db'),
+    threadsConnection: forwardTo('db'),
 
     me(parent, args, ctx, info) {
         // check if there is a current user id (middlewareでuserIdがrequestに付加されているかチェック)

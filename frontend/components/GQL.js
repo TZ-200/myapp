@@ -1,9 +1,16 @@
 import gql from 'graphql-tag'
-
+import { threadPerPage } from '../config'
 
 const THREADS_QUERY = gql`
-    query {
-        threads {
+    query THREADS_QUERY(
+        $skip: Int = 0,
+        $first: Int = ${threadPerPage}
+    ){
+        threads (
+            first: $first,
+            skip: $skip,
+            orderBy: createdAt_DESC
+        ){
             id
             title
         }
@@ -47,7 +54,24 @@ const CURRENT_USER_QUERY = gql`
     query {
         me {
             id
+            name
             email
+            description
+            image
+            Threads{
+                id
+                title
+            }
+            Comments {
+                id
+                thread{
+                    id
+                }
+                text
+                upvotes{
+                    id
+                }
+            }
         }
     }
 `
@@ -199,6 +223,33 @@ const UPDATE_THREAD_MUTATION = gql`
     }
 `
 
+const UPDATE_USER_MUTATION = gql`
+    mutation UPDATE_USER_MUTATION(
+        $name: String
+        $image: String
+        $description: String
+    ){
+        updateUser(
+            name: $name
+            image: $image
+            description: $description
+        ){
+            id
+        }
+    }
+`
+
+const PAGINATION_QUERY = gql`
+    query PAGINATION_QUERY {
+        threadsConnection {
+            aggregate {
+                count
+            }
+        }
+    }
+`
+
+
 export { 
     THREADS_QUERY, 
     CREATE_THREAD, SIGNUP, 
@@ -213,4 +264,6 @@ export {
     CHECK_THREAD_PERMISSION_MUTATION,
     CREATE_UPVOTE,
     DELETE_UPVOTE_MUTATION,
+    PAGINATION_QUERY,
+    UPDATE_USER_MUTATION,
 }

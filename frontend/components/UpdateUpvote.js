@@ -34,8 +34,10 @@ class UpdateUpvote extends Component {
                     id: this.state.upvoteId
                 }}
             >
-                {(deleteUpvote, {deleteLoading, deleteError}) => {
+                {(deleteUpvote, {loading, error}) => {
+                    const deleteLoading = loading 
                     return(
+
                     <Mutation
                         mutation={CREATE_UPVOTE}
                         variables={{

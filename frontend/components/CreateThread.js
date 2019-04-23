@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Mutation } from 'react-apollo'
 import Error from './ErrorMessage'
 import Router from 'next/router'
-import { CREATE_THREAD } from './GQL'
+import { CREATE_THREAD, THREADS_QUERY } from './GQL'
+import { threadPerPage } from '../config';
 
 class CreateThread extends Component {
     
@@ -19,6 +20,15 @@ class CreateThread extends Component {
         <Mutation 
             mutation={CREATE_THREAD}
             variables={this.state}
+            refetchQueries={() => {     // これでキャッシュ内のデータが更新されるのでリロードしなくて済む
+                return[{
+                    query : THREADS_QUERY,
+                    variables: {
+                        skip: this.props.page * threadPerPage - threadPerPage,
+                        first: threadPerPage 
+                     }
+                }]
+            }}
         >
             {(createThread, { loading, error }) => (
 
@@ -30,7 +40,7 @@ class CreateThread extends Component {
                         Router.push({
                             pathname: '/thread',
                             query: { id: res.data.createThread.id }
-                        }).then(() => location.reload())
+                        })
                     }}
                 >
                 <Error error={error} /> 
