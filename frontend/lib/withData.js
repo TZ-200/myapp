@@ -23,7 +23,6 @@ function createClient({ headers }) {
     },
 
     // Local data
-    // Hot Reloadはないので一々リロードしてください   
     clientState: {
       resolvers: {
         Mutation: {
