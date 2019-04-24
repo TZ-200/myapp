@@ -1,7 +1,9 @@
-endpoint: https://us1.prisma.sh/ikyohei2100-08fc7c/tz-blog/dev
-# endpoint: https://sick-fits-1254d81af4.herokuapp.com/sick-fits-prod/prod
+#endpoint: https://us1.prisma.sh/ikyohei2100-08fc7c/tz-blog/dev
+#endpoint: https://vt-grid-4e34bbbfbb.herokuapp.com/vt-grid-prod/prod
+endpoint: https://vt-grid-4e34bbbfbb.herokuapp.com/vt-grid-prod/prod
 datamodel: datamodel.graphql
-secret: weglgqwbnelgrqgb;qg;q:fgibt430923m
+# secret: weglgqwbnelgrqgb;qg;q:fgibt430923m
+secret: ${env:PRISMA_SECRET}
 
 generate:
   - generator: graphql-schema
