@@ -168,8 +168,8 @@ const Mutations = {
     },
 
     async createVtuber(parent, args, ctx, info) {
-        if(ctx.request.user.permission !== 'ADMIN') {
-            throw new Error('You must be ADMIN!')
+        if(!ctx.request.userId){
+            throw new Error('You must be logged in to do that!')
         }
         
         const vtuber = await ctx.db.mutation.createVtuber({

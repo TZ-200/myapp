@@ -9,11 +9,12 @@ const Nav = () => (
                 <Link href="/">
                     <a>All</a>
                 </Link>
-                <Link href="/threads">
-                    <a>Home</a>
-                </Link>
+
                 { me && (
                     <React.Fragment>
+                        <Link href="/threads">
+                            <a>Home</a>
+                        </Link>    
                         <Link href="/account">
                             <a>Account</a>
                         </Link>

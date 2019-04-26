@@ -1,9 +1,10 @@
 import Vtubers from '../components/Vtubers'
+import PleaseSignIn from '../components/PleaseSignin'
 
 const VtubersPage = props => (
-    <div>
+    <PleaseSignIn>
         <Vtubers page={parseFloat(props.query.page) || 1}/>
-    </div>
+    </PleaseSignIn>
 )
 
 export default VtubersPage

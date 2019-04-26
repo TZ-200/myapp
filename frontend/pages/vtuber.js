@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import Vtuber from '../components/Vtuber'
+import PleaseSignIn from '../components/PleaseSignin'
 
 const vtuberPage = props => (
-    <div>
+    <PleaseSignIn>
         <Vtuber id={props.query.id} page={parseFloat(props.query.page) || 1}/>
-    </div>
+    </PleaseSignIn>
 );
 
 export default vtuberPage;
