@@ -18,6 +18,8 @@ class Thread extends Component {
     }
 
     render() {
+        console.log(this.props.id);
+        
         return (
                     <Query 
                         query={SINGLE_THREAD_QUERY} 
@@ -33,8 +35,8 @@ class Thread extends Component {
                             const comments = data.thread.comments
                             return(
                                 <React.Fragment>
-                                <h2>Title: {thread.title} Text: {thread.text}</h2>
-
+                                <h2>Title: {thread.title} Text: {thread.text} Vtuber:{thread.vtuber.name}</h2>
+                                <p>{thread.image && <img width="200" height="200" style={{objectFit:'cover'}} src={thread.image} alt="Thread Image"/>}</p>
                                 <User>
                                     {({data: { me }}) => (
                                         <React.Fragment>

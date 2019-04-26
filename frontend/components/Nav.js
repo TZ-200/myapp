@@ -7,18 +7,21 @@ const Nav = () => (
         {({data: { me }}) => (
             <React.Fragment>
                 <Link href="/">
-                    <a>Index</a>
+                    <a>All</a>
                 </Link>
                 <Link href="/threads">
-                    <a>Threads</a>
+                    <a>Home</a>
                 </Link>
                 { me && (
                     <React.Fragment>
-                        <Link href="/post">
-                            <a>Post</a>
-                        </Link>
                         <Link href="/account">
                             <a>Account</a>
+                        </Link>
+                        <Link href="/register">
+                            <a>Register</a>
+                        </Link>
+                        <Link href="/vtubers">
+                            <a>Vtubers</a>
                         </Link>
                         <Signout/>
                     </React.Fragment>

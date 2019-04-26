@@ -1,21 +1,21 @@
 import React, { Component } from 'react';
 import { Query } from 'react-apollo'
-import { THREADS_QUERY } from './GQL'
+import { VTUBERS_QUERY, PAGINATION_VTUBERS_QUERY } from './GQL'
 import Link from 'next/link'
-import ThreadPagination from './ThreadPagination'
-import { threadPerPage } from '../config';
+import VtuberPagination from './VtuberPagination'
+import { vtuberPerPage } from '../config';
 
-class Threads extends Component {
+class Vtubers extends Component {
     render() {
         return (
             <div>
-                <ThreadPagination page={this.props.page}/>
+            <VtuberPagination page={this.props.page} path={'vtubers'} />
                 <Query 
-                    query={THREADS_QUERY}
+                    query={VTUBERS_QUERY}
                     variables={{
-                        skip: this.props.page * threadPerPage - threadPerPage,
-                        first: threadPerPage 
-                     }}    
+                        skip: this.props.page * vtuberPerPage - vtuberPerPage,
+                        first: vtuberPerPage 
+                    }}    
                 >
                     { ({ data, error, loading }) => {
                         if(loading) return <p>Loading...</p>
@@ -23,20 +23,20 @@ class Threads extends Component {
                         return (
                             <div>
                             {
-                                data.threads.map(thread => (
-                                    <div key={thread.id}>
+                                data.vtubers.map(vtuber => (
+                                    <div key={vtuber.id}>
                                     <Link 
                                         href={{
-                                            pathname: '/thread',
-                                            query: { id: thread.id }
+                                            pathname: '/vtuber',
+                                            query: { id: vtuber.id }
                                         }}
                                         
                                     >
                                         
                                         <a>
-                                            <div>{thread.title}</div> 
-                                            <div>{thread.image && <img width="200" height="200" style={{objectFit:'cover'}} src={thread.image} alt="Thread Image"/>}</div>
-                                            <div>{thread.comments.length}</div> 
+                                            <div>{vtuber.name}</div> 
+                                            <div><img width="200" height="200" style={{objectFit:'cover'}} src={vtuber.image} alt="Vtuber Image"/></div>
+                                            <div>{vtuber.followers && vtuber.followers.length}</div> 
                                         </a>
                                         
                                     </Link>
@@ -48,10 +48,11 @@ class Threads extends Component {
                         
                     }}
                 </Query>
-                <ThreadPagination page={this.props.page}/>
+            <VtuberPagination page={this.props.page} path={'vtubers'} />
+
             </div>
         );
     }
 }
 
-export default Threads;
+export default Vtubers;

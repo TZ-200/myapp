@@ -2,11 +2,13 @@ import React, { Component } from 'react';
 import DeleteComment from './DeleteComment'
 import UpdateUpvote from './UpdateUpvote'
 import User from './User'
+import CreateReply from './CreateReply'
 
 class Comment extends Component {
     
     state={
-        upvotes: this.props.comment.upvotes.length
+        upvotes: this.props.comment.upvotes.length,
+        reply: false
     }
 
     toUpvote = () => {
@@ -34,6 +36,14 @@ class Comment extends Component {
                                         userId={me.id}
                                     />
                                     <DeleteComment threadId={this.props.threadId} commentId={comment.id}/>
+                                    <button
+                                        onClick={()=>{
+                                            this.setState({ reply: !this.state.reply })
+                                        }}
+                                    >
+                                        Reply
+                                    </button>
+                                    { this.state.reply && <CreateReply threadId={this.props.threadId} commentId={comment.id}/> }
                                 </React.Fragment>
                             )
                         } else {

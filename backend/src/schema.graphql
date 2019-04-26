@@ -14,15 +14,17 @@ type Mutation {
     # addToCart(id: ID!): CartItem
     # removeFromCart(id: ID!): CartItem
     # createOrder(token: String!): Order!
-    createThread(title: String!, text: String!, image: String): Thread!
+    createThread(title: String!, text: String!, image: String, vtuber: ID!): Thread!
     updateThread(id: ID!, title: String!, text: String!, image: String): Thread!
     deleteThread(id: ID!): Thread!
-    createComment(text: String!, thread: ID!): Comment!
+    createComment(text: String!, thread: ID!, reply: ID): Comment!
     deleteComment(id: ID!): Comment!
     createUpvote(authorId: ID!, commentId: ID!): Upvote!
     deleteUpvote(id: ID!): Upvote!
     updateUser(name: String, description: String, image: String): User!
-    # upvote(comment: ID!): upvote!
+    createVtuber(name: String!, channelId: String!, image: String!): Vtuber!
+    createFollow(vtuber: ID!): User!
+    deleteFollow(vtuber: ID!): User!
 }
 
 type Query {
@@ -34,8 +36,12 @@ type Query {
     # order(id: ID!): Order
     threads(where: ThreadWhereInput, orderBy: ThreadOrderByInput, skip: Int, first: Int): [Thread]!
     thread(where: ThreadWhereUniqueInput!): Thread
+    # followingThreads(where: ThreadWhereInput, orderBy: ThreadOrderByInput, skip: Int, first: Int): [Thread]!
     comments(where: CommentWhereInput): [Comment]!
     threadsConnection(where: ThreadWhereInput): ThreadConnection!
+    vtubersConnection(where: VtuberWhereInput): VtuberConnection!
+    vtubers(where: VtuberWhereInput, orderBy: VtuberOrderByInput, skip: Int, first: Int): [Vtuber]!
+    vtuber(where: VtuberWhereUniqueInput!): Vtuber!
 }
 
 # Client側に送信してはならない情報（password/resetTokenを削除（Redefine））

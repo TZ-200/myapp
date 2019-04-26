@@ -81,8 +81,41 @@ const Mutations = {
         }, info)
     },
 
+    async createFollow(parent, args, ctx, info) {
+        if(!ctx.request.userId){
+            throw new Error('You must be logged in to do that!')
+        }
+        return ctx.db.mutation.updateUser({
+            data: {
+                follows: {
+                    connect: {
+                        id: args.vtuber
+                    }
+                }
+            },
+            where: {
+                id: ctx.request.userId
+            }
+        }, info)
+    },
 
-    
+    async deleteFollow(parent, args, ctx, info) {
+        if(!ctx.request.userId){
+            throw new Error('You must be logged in to do that!')
+        }
+        return ctx.db.mutation.updateUser({
+            data: {
+                follows: {
+                    disconnect: {
+                        id: args.vtuber
+                    }
+                }
+            },
+            where: {
+                id: ctx.request.userId
+            }
+        }, info)
+    },
 
     async signup(parent, args, ctx, info) {
         // emailは全部小文字にした方が色々と都合がいいらしい
@@ -121,10 +154,30 @@ const Mutations = {
                         id: ctx.request.userId
                     }
                 },
-                ...args,
+                vtuber: {
+                    connect: {
+                        id: args.vtuber
+                    }
+                },
+                title: args.title,
+                text: args.text,
+                image: args.image
             }
         }, info)
         return thread
+    },
+
+    async createVtuber(parent, args, ctx, info) {
+        if(ctx.request.user.permission !== 'ADMIN') {
+            throw new Error('You must be ADMIN!')
+        }
+        
+        const vtuber = await ctx.db.mutation.createVtuber({
+            data:{
+                ...args,
+            }
+        }, info)
+        return vtuber
     },
 
     async updateThread(parent, args, ctx, info) {
@@ -169,19 +222,33 @@ const Mutations = {
         if(!ctx.request.userId){
             throw new Error('You must be logged in to do that!')
         }
-        const comment = await ctx.db.mutation.createComment({
-            data:{
-                author: {
-                    connect: {
-                        id: ctx.request.userId
-                    }
-                },
-                thread: {
-                    connect: {
-                        id: args.thread
-                    }
-                },
-                text: args.text,
+        let data = {
+            author: {
+                connect: {
+                    id: ctx.request.userId
+                }
+            },
+            thread: {
+                connect: {
+                    id: args.thread
+                }
+            },
+            text: args.text,
+        }
+
+        if(args.reply){
+            data = { ...data, reply:{connect:{id: args.reply}}}
+        }
+
+        const comment = await ctx.db.mutation.createComment({ data }, info)
+        const thread = await ctx.db.query.thread({ where: {id: args.thread}})
+        await ctx.db.mutation.updateThread({
+            data: {
+                title: thread.title,
+                text: thread.text
+            },
+            where: {
+                id: args.thread
             }
         }, info)
         return comment
@@ -262,6 +329,8 @@ const Mutations = {
         // const comment = await ctx.db.query.comment({where}, `{ id upvotes{id} thread{id} }`)
         // return comment
     },
+
+
 
     async deleteUpvote(parent, args, ctx, info) {
         const where = { id: args.id }

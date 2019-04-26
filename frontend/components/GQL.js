@@ -1,18 +1,51 @@
 import gql from 'graphql-tag'
-import { threadPerPage } from '../config'
+import { threadPerPage, vtuberPerPage } from '../config'
 
 const THREADS_QUERY = gql`
     query THREADS_QUERY(
         $skip: Int = 0,
         $first: Int = ${threadPerPage}
+        $vtuberIds: [ID!]
     ){
         threads (
+            first: $first,
+            skip: $skip,
+            orderBy: updatedAt_DESC
+            where: {
+                vtuber: {
+                    id_in: $vtuberIds
+                }
+            }
+        ){
+            id
+            title
+            image
+            comments{
+                id
+            }
+            vtuber{
+                id
+                name
+            }
+        }
+    }
+`
+
+
+const VTUBERS_QUERY = gql`
+    query VTUBERS_QUERY(
+        $skip: Int = 0,
+        $first: Int = ${vtuberPerPage}
+    ){
+        vtubers (
             first: $first,
             skip: $skip,
             orderBy: createdAt_DESC
         ){
             id
-            title
+            name
+            channelId
+            image
         }
     }
 `
@@ -21,12 +54,54 @@ const CREATE_THREAD = gql`
     mutation CREATE_THREAD (
         $title: String!,
         $text: String!,
-        $image: String
+        $image: String,
+        $vtuber: ID!
     ) {
         createThread (
             title: $title,
             text: $text,
             image: $image,
+            vtuber: $vtuber
+        ){
+            id
+        }
+    }
+`
+
+const CREATE_FOLLOW = gql`
+    mutation CREATE_FOLLOW (
+        $vtuber: ID!
+    ){
+        createFollow (
+            vtuber: $vtuber
+        ){
+            id
+        }
+    }
+`
+
+const DELETE_FOLLOW = gql`
+    mutation DELETE_FOLLOW (
+        $vtuber: ID!
+    ){
+        deleteFollow (
+            vtuber: $vtuber
+        ){
+            id
+        }
+    }
+`
+
+const CREATE_VTUBER = gql`
+    mutation CREATE_VTUBER (
+        $name: String!,
+        $image: String!,
+        $channelId: String!
+    ) {
+        createVtuber (
+            name: $name,
+            image: $image,
+            channelId: $channelId
         ){
             id
         }
@@ -58,6 +133,10 @@ const CURRENT_USER_QUERY = gql`
             email
             description
             image
+            follows{
+                id
+                name
+            }
             Threads{
                 id
                 title
@@ -110,6 +189,11 @@ const SINGLE_THREAD_QUERY = gql`
             id
             title
             text
+            image
+            vtuber{
+                id
+                name
+            }
             comments{
                 id
                 text
@@ -128,14 +212,44 @@ const SINGLE_THREAD_QUERY = gql`
     }
 `
 
+const SINGLE_VTUBER_QUERY = gql`
+    query SINGLE_VTUBER_QUERY(
+            $id: ID!,
+            $skip: Int = 0,
+            $first: Int = ${threadPerPage}
+    ){
+        vtuber(
+            where: {
+                id: $id
+            }
+        ){
+            id
+            name
+            channelId
+            image
+            threads(
+                orderBy: updatedAt_DESC,
+                first: $first,
+                skip: $skip
+            ){
+                id
+                title
+                image
+            }
+        }
+    }
+`
+
 const CREATE_COMMENT = gql`
     mutation CREATE_COMMENT(
         $text: String!
         $thread: ID!
+        $reply: ID
     ){
         createComment(
             text: $text
             thread: $thread
+            reply: $reply
         ){
             id
             text
@@ -240,15 +354,31 @@ const UPDATE_USER_MUTATION = gql`
 `
 
 const PAGINATION_QUERY = gql`
-    query PAGINATION_QUERY {
-        threadsConnection {
+    query PAGINATION_QUERY (
+        $vtuberIds: [ID!]
+    ) {
+        threadsConnection (
+            where: {
+                vtuber: {
+                    id_in: $vtuberIds
+                }
+            }
+        ) {
             aggregate {
                 count
             }
         }
     }
 `
-
+const PAGINATION_VTUBERS_QUERY = gql`
+    query PAGINATION_VTUBERS_QUERY {
+        vtubersConnection {
+            aggregate {
+                count
+            }
+        }
+    }
+`
 
 export { 
     THREADS_QUERY, 
@@ -266,4 +396,10 @@ export {
     DELETE_UPVOTE_MUTATION,
     PAGINATION_QUERY,
     UPDATE_USER_MUTATION,
+    CREATE_VTUBER,
+    VTUBERS_QUERY,
+    SINGLE_VTUBER_QUERY,
+    CREATE_FOLLOW,
+    DELETE_FOLLOW,
+    PAGINATION_VTUBERS_QUERY,
 }

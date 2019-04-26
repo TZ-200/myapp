@@ -17,6 +17,18 @@ type User {
   permission: Permission!
   updatedAt: DateTime! @updatedAt
   createdAt: DateTime! @createdAt
+  follows: [Vtuber!] @relation(name: "UserToVtuber", onDelete: SET_NULL)
+}
+
+type Vtuber {
+  id: ID! @unique @id
+  name: String!
+  image: String!
+  channelId: String! @unique
+  threads: [Thread!] @relation(name: "ThreadToVtuber", onDelete: SET_NULL)
+  followers: [User!] @relation(name: "UserToVtuber", onDelete: SET_NULL)
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 }
 
 type Thread {
@@ -28,6 +40,7 @@ type Thread {
   updatedAt: DateTime! @updatedAt
   author: User! @relation(name: "ThreadToUser", onDelete: SET_NULL)
   comments: [Comment!] @relation(name: "CommentToThread", onDelete: CASCADE)
+  vtuber: Vtuber! @relation(name: "ThreadToVtuber", onDelete: SET_NULL)
 }
 
 type Comment {
@@ -38,6 +51,7 @@ type Comment {
   author: User! @relation(name: "CommentToUser", onDelete: SET_NULL) 
   thread: Thread! @relation(name: "CommentToThread", onDelete: SET_NULL)
   upvotes: [Upvote!] @relation(name: "UpvoteToComment", onDelete: CASCADE)
+  reply: Comment
 }
 
 type Upvote {

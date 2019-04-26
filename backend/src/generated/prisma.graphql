@@ -14,6 +14,10 @@ type AggregateUser {
   count: Int!
 }
 
+type AggregateVtuber {
+  count: Int!
+}
+
 type BatchPayload {
   count: Long!
 }
@@ -26,6 +30,7 @@ type Comment {
   author: User!
   thread: Thread!
   upvotes(where: UpvoteWhereInput, orderBy: UpvoteOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Upvote!]
+  reply: Comment
 }
 
 type CommentConnection {
@@ -39,6 +44,7 @@ input CommentCreateInput {
   author: UserCreateOneWithoutCommentsInput!
   thread: ThreadCreateOneWithoutCommentsInput!
   upvotes: UpvoteCreateManyWithoutCommentInput
+  reply: CommentCreateOneInput
 }
 
 input CommentCreateManyWithoutAuthorInput {
@@ -51,6 +57,11 @@ input CommentCreateManyWithoutThreadInput {
   connect: [CommentWhereUniqueInput!]
 }
 
+input CommentCreateOneInput {
+  create: CommentCreateInput
+  connect: CommentWhereUniqueInput
+}
+
 input CommentCreateOneWithoutUpvotesInput {
   create: CommentCreateWithoutUpvotesInput
   connect: CommentWhereUniqueInput
@@ -60,18 +71,21 @@ input CommentCreateWithoutAuthorInput {
   text: String!
   thread: ThreadCreateOneWithoutCommentsInput!
   upvotes: UpvoteCreateManyWithoutCommentInput
+  reply: CommentCreateOneInput
 }
 
 input CommentCreateWithoutThreadInput {
   text: String!
   author: UserCreateOneWithoutCommentsInput!
   upvotes: UpvoteCreateManyWithoutCommentInput
+  reply: CommentCreateOneInput
 }
 
 input CommentCreateWithoutUpvotesInput {
   text: String!
   author: UserCreateOneWithoutCommentsInput!
   thread: ThreadCreateOneWithoutCommentsInput!
+  reply: CommentCreateOneInput
 }
 
 type CommentEdge {
@@ -115,11 +129,20 @@ input CommentSubscriptionWhereInput {
   NOT: [CommentSubscriptionWhereInput!]
 }
 
+input CommentUpdateDataInput {
+  text: String
+  author: UserUpdateOneRequiredWithoutCommentsInput
+  thread: ThreadUpdateOneRequiredWithoutCommentsInput
+  upvotes: UpvoteUpdateManyWithoutCommentInput
+  reply: CommentUpdateOneInput
+}
+
 input CommentUpdateInput {
   text: String
   author: UserUpdateOneRequiredWithoutCommentsInput
   thread: ThreadUpdateOneRequiredWithoutCommentsInput
   upvotes: UpvoteUpdateManyWithoutCommentInput
+  reply: CommentUpdateOneInput
 }
 
 input CommentUpdateManyWithoutAuthorInput {
@@ -140,6 +163,15 @@ input CommentUpdateManyWithoutThreadInput {
   upsert: [CommentUpsertWithWhereUniqueWithoutThreadInput!]
 }
 
+input CommentUpdateOneInput {
+  create: CommentCreateInput
+  update: CommentUpdateDataInput
+  upsert: CommentUpsertNestedInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: CommentWhereUniqueInput
+}
+
 input CommentUpdateOneRequiredWithoutUpvotesInput {
   create: CommentCreateWithoutUpvotesInput
   update: CommentUpdateWithoutUpvotesDataInput
@@ -151,18 +183,21 @@ input CommentUpdateWithoutAuthorDataInput {
   text: String
   thread: ThreadUpdateOneRequiredWithoutCommentsInput
   upvotes: UpvoteUpdateManyWithoutCommentInput
+  reply: CommentUpdateOneInput
 }
 
 input CommentUpdateWithoutThreadDataInput {
   text: String
   author: UserUpdateOneRequiredWithoutCommentsInput
   upvotes: UpvoteUpdateManyWithoutCommentInput
+  reply: CommentUpdateOneInput
 }
 
 input CommentUpdateWithoutUpvotesDataInput {
   text: String
   author: UserUpdateOneRequiredWithoutCommentsInput
   thread: ThreadUpdateOneRequiredWithoutCommentsInput
+  reply: CommentUpdateOneInput
 }
 
 input CommentUpdateWithWhereUniqueWithoutAuthorInput {
@@ -173,6 +208,11 @@ input CommentUpdateWithWhereUniqueWithoutAuthorInput {
 input CommentUpdateWithWhereUniqueWithoutThreadInput {
   where: CommentWhereUniqueInput!
   data: CommentUpdateWithoutThreadDataInput!
+}
+
+input CommentUpsertNestedInput {
+  update: CommentUpdateDataInput!
+  create: CommentCreateInput!
 }
 
 input CommentUpsertWithoutUpvotesInput {
@@ -242,6 +282,7 @@ input CommentWhereInput {
   upvotes_every: UpvoteWhereInput
   upvotes_some: UpvoteWhereInput
   upvotes_none: UpvoteWhereInput
+  reply: CommentWhereInput
   AND: [CommentWhereInput!]
   OR: [CommentWhereInput!]
   NOT: [CommentWhereInput!]
@@ -280,6 +321,12 @@ type Mutation {
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   deleteUser(where: UserWhereUniqueInput!): User
   deleteManyUsers(where: UserWhereInput): BatchPayload!
+  createVtuber(data: VtuberCreateInput!): Vtuber!
+  updateVtuber(data: VtuberUpdateInput!, where: VtuberWhereUniqueInput!): Vtuber
+  updateManyVtubers(data: VtuberUpdateInput!, where: VtuberWhereInput): BatchPayload!
+  upsertVtuber(where: VtuberWhereUniqueInput!, create: VtuberCreateInput!, update: VtuberUpdateInput!): Vtuber!
+  deleteVtuber(where: VtuberWhereUniqueInput!): Vtuber
+  deleteManyVtubers(where: VtuberWhereInput): BatchPayload!
 }
 
 enum MutationType {
@@ -318,6 +365,9 @@ type Query {
   user(where: UserWhereUniqueInput!): User
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
+  vtuber(where: VtuberWhereUniqueInput!): Vtuber
+  vtubers(where: VtuberWhereInput, orderBy: VtuberOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Vtuber]!
+  vtubersConnection(where: VtuberWhereInput, orderBy: VtuberOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): VtuberConnection!
   node(id: ID!): Node
 }
 
@@ -326,6 +376,7 @@ type Subscription {
   thread(where: ThreadSubscriptionWhereInput): ThreadSubscriptionPayload
   upvote(where: UpvoteSubscriptionWhereInput): UpvoteSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
+  vtuber(where: VtuberSubscriptionWhereInput): VtuberSubscriptionPayload
 }
 
 type Thread {
@@ -337,6 +388,7 @@ type Thread {
   updatedAt: DateTime!
   author: User!
   comments(where: CommentWhereInput, orderBy: CommentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Comment!]
+  vtuber: Vtuber!
 }
 
 type ThreadConnection {
@@ -351,10 +403,16 @@ input ThreadCreateInput {
   image: String
   author: UserCreateOneWithoutThreadsInput!
   comments: CommentCreateManyWithoutThreadInput
+  vtuber: VtuberCreateOneWithoutThreadsInput!
 }
 
 input ThreadCreateManyWithoutAuthorInput {
   create: [ThreadCreateWithoutAuthorInput!]
+  connect: [ThreadWhereUniqueInput!]
+}
+
+input ThreadCreateManyWithoutVtuberInput {
+  create: [ThreadCreateWithoutVtuberInput!]
   connect: [ThreadWhereUniqueInput!]
 }
 
@@ -368,6 +426,7 @@ input ThreadCreateWithoutAuthorInput {
   text: String!
   image: String
   comments: CommentCreateManyWithoutThreadInput
+  vtuber: VtuberCreateOneWithoutThreadsInput!
 }
 
 input ThreadCreateWithoutCommentsInput {
@@ -375,6 +434,15 @@ input ThreadCreateWithoutCommentsInput {
   text: String!
   image: String
   author: UserCreateOneWithoutThreadsInput!
+  vtuber: VtuberCreateOneWithoutThreadsInput!
+}
+
+input ThreadCreateWithoutVtuberInput {
+  title: String!
+  text: String!
+  image: String
+  author: UserCreateOneWithoutThreadsInput!
+  comments: CommentCreateManyWithoutThreadInput
 }
 
 type ThreadEdge {
@@ -430,6 +498,7 @@ input ThreadUpdateInput {
   image: String
   author: UserUpdateOneRequiredWithoutThreadsInput
   comments: CommentUpdateManyWithoutThreadInput
+  vtuber: VtuberUpdateOneRequiredWithoutThreadsInput
 }
 
 input ThreadUpdateManyWithoutAuthorInput {
@@ -439,6 +508,15 @@ input ThreadUpdateManyWithoutAuthorInput {
   disconnect: [ThreadWhereUniqueInput!]
   update: [ThreadUpdateWithWhereUniqueWithoutAuthorInput!]
   upsert: [ThreadUpsertWithWhereUniqueWithoutAuthorInput!]
+}
+
+input ThreadUpdateManyWithoutVtuberInput {
+  create: [ThreadCreateWithoutVtuberInput!]
+  delete: [ThreadWhereUniqueInput!]
+  connect: [ThreadWhereUniqueInput!]
+  disconnect: [ThreadWhereUniqueInput!]
+  update: [ThreadUpdateWithWhereUniqueWithoutVtuberInput!]
+  upsert: [ThreadUpsertWithWhereUniqueWithoutVtuberInput!]
 }
 
 input ThreadUpdateOneRequiredWithoutCommentsInput {
@@ -453,6 +531,7 @@ input ThreadUpdateWithoutAuthorDataInput {
   text: String
   image: String
   comments: CommentUpdateManyWithoutThreadInput
+  vtuber: VtuberUpdateOneRequiredWithoutThreadsInput
 }
 
 input ThreadUpdateWithoutCommentsDataInput {
@@ -460,11 +539,25 @@ input ThreadUpdateWithoutCommentsDataInput {
   text: String
   image: String
   author: UserUpdateOneRequiredWithoutThreadsInput
+  vtuber: VtuberUpdateOneRequiredWithoutThreadsInput
+}
+
+input ThreadUpdateWithoutVtuberDataInput {
+  title: String
+  text: String
+  image: String
+  author: UserUpdateOneRequiredWithoutThreadsInput
+  comments: CommentUpdateManyWithoutThreadInput
 }
 
 input ThreadUpdateWithWhereUniqueWithoutAuthorInput {
   where: ThreadWhereUniqueInput!
   data: ThreadUpdateWithoutAuthorDataInput!
+}
+
+input ThreadUpdateWithWhereUniqueWithoutVtuberInput {
+  where: ThreadWhereUniqueInput!
+  data: ThreadUpdateWithoutVtuberDataInput!
 }
 
 input ThreadUpsertWithoutCommentsInput {
@@ -476,6 +569,12 @@ input ThreadUpsertWithWhereUniqueWithoutAuthorInput {
   where: ThreadWhereUniqueInput!
   update: ThreadUpdateWithoutAuthorDataInput!
   create: ThreadCreateWithoutAuthorInput!
+}
+
+input ThreadUpsertWithWhereUniqueWithoutVtuberInput {
+  where: ThreadWhereUniqueInput!
+  update: ThreadUpdateWithoutVtuberDataInput!
+  create: ThreadCreateWithoutVtuberInput!
 }
 
 input ThreadWhereInput {
@@ -555,6 +654,7 @@ input ThreadWhereInput {
   comments_every: CommentWhereInput
   comments_some: CommentWhereInput
   comments_none: CommentWhereInput
+  vtuber: VtuberWhereInput
   AND: [ThreadWhereInput!]
   OR: [ThreadWhereInput!]
   NOT: [ThreadWhereInput!]
@@ -747,6 +847,7 @@ type User {
   permission: Permission!
   updatedAt: DateTime!
   createdAt: DateTime!
+  follows(where: VtuberWhereInput, orderBy: VtuberOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Vtuber!]
 }
 
 type UserConnection {
@@ -765,6 +866,12 @@ input UserCreateInput {
   Threads: ThreadCreateManyWithoutAuthorInput
   Upvotes: UpvoteCreateManyWithoutAuthorInput
   permission: Permission!
+  follows: VtuberCreateManyWithoutFollowersInput
+}
+
+input UserCreateManyWithoutFollowsInput {
+  create: [UserCreateWithoutFollowsInput!]
+  connect: [UserWhereUniqueInput!]
 }
 
 input UserCreateOneWithoutCommentsInput {
@@ -791,6 +898,19 @@ input UserCreateWithoutCommentsInput {
   Threads: ThreadCreateManyWithoutAuthorInput
   Upvotes: UpvoteCreateManyWithoutAuthorInput
   permission: Permission!
+  follows: VtuberCreateManyWithoutFollowersInput
+}
+
+input UserCreateWithoutFollowsInput {
+  name: String!
+  email: String!
+  password: String!
+  description: String
+  image: String
+  Comments: CommentCreateManyWithoutAuthorInput
+  Threads: ThreadCreateManyWithoutAuthorInput
+  Upvotes: UpvoteCreateManyWithoutAuthorInput
+  permission: Permission!
 }
 
 input UserCreateWithoutThreadsInput {
@@ -802,6 +922,7 @@ input UserCreateWithoutThreadsInput {
   Comments: CommentCreateManyWithoutAuthorInput
   Upvotes: UpvoteCreateManyWithoutAuthorInput
   permission: Permission!
+  follows: VtuberCreateManyWithoutFollowersInput
 }
 
 input UserCreateWithoutUpvotesInput {
@@ -813,6 +934,7 @@ input UserCreateWithoutUpvotesInput {
   Comments: CommentCreateManyWithoutAuthorInput
   Threads: ThreadCreateManyWithoutAuthorInput
   permission: Permission!
+  follows: VtuberCreateManyWithoutFollowersInput
 }
 
 type UserEdge {
@@ -881,6 +1003,16 @@ input UserUpdateInput {
   Threads: ThreadUpdateManyWithoutAuthorInput
   Upvotes: UpvoteUpdateManyWithoutAuthorInput
   permission: Permission
+  follows: VtuberUpdateManyWithoutFollowersInput
+}
+
+input UserUpdateManyWithoutFollowsInput {
+  create: [UserCreateWithoutFollowsInput!]
+  delete: [UserWhereUniqueInput!]
+  connect: [UserWhereUniqueInput!]
+  disconnect: [UserWhereUniqueInput!]
+  update: [UserUpdateWithWhereUniqueWithoutFollowsInput!]
+  upsert: [UserUpsertWithWhereUniqueWithoutFollowsInput!]
 }
 
 input UserUpdateOneRequiredWithoutCommentsInput {
@@ -913,6 +1045,19 @@ input UserUpdateWithoutCommentsDataInput {
   Threads: ThreadUpdateManyWithoutAuthorInput
   Upvotes: UpvoteUpdateManyWithoutAuthorInput
   permission: Permission
+  follows: VtuberUpdateManyWithoutFollowersInput
+}
+
+input UserUpdateWithoutFollowsDataInput {
+  name: String
+  email: String
+  password: String
+  description: String
+  image: String
+  Comments: CommentUpdateManyWithoutAuthorInput
+  Threads: ThreadUpdateManyWithoutAuthorInput
+  Upvotes: UpvoteUpdateManyWithoutAuthorInput
+  permission: Permission
 }
 
 input UserUpdateWithoutThreadsDataInput {
@@ -924,6 +1069,7 @@ input UserUpdateWithoutThreadsDataInput {
   Comments: CommentUpdateManyWithoutAuthorInput
   Upvotes: UpvoteUpdateManyWithoutAuthorInput
   permission: Permission
+  follows: VtuberUpdateManyWithoutFollowersInput
 }
 
 input UserUpdateWithoutUpvotesDataInput {
@@ -935,6 +1081,12 @@ input UserUpdateWithoutUpvotesDataInput {
   Comments: CommentUpdateManyWithoutAuthorInput
   Threads: ThreadUpdateManyWithoutAuthorInput
   permission: Permission
+  follows: VtuberUpdateManyWithoutFollowersInput
+}
+
+input UserUpdateWithWhereUniqueWithoutFollowsInput {
+  where: UserWhereUniqueInput!
+  data: UserUpdateWithoutFollowsDataInput!
 }
 
 input UserUpsertWithoutCommentsInput {
@@ -950,6 +1102,12 @@ input UserUpsertWithoutThreadsInput {
 input UserUpsertWithoutUpvotesInput {
   update: UserUpdateWithoutUpvotesDataInput!
   create: UserCreateWithoutUpvotesInput!
+}
+
+input UserUpsertWithWhereUniqueWithoutFollowsInput {
+  where: UserWhereUniqueInput!
+  update: UserUpdateWithoutFollowsDataInput!
+  create: UserCreateWithoutFollowsInput!
 }
 
 input UserWhereInput {
@@ -1066,6 +1224,9 @@ input UserWhereInput {
   createdAt_lte: DateTime
   createdAt_gt: DateTime
   createdAt_gte: DateTime
+  follows_every: VtuberWhereInput
+  follows_some: VtuberWhereInput
+  follows_none: VtuberWhereInput
   AND: [UserWhereInput!]
   OR: [UserWhereInput!]
   NOT: [UserWhereInput!]
@@ -1074,4 +1235,243 @@ input UserWhereInput {
 input UserWhereUniqueInput {
   id: ID
   email: String
+}
+
+type Vtuber {
+  id: ID!
+  name: String!
+  image: String!
+  channelId: String!
+  threads(where: ThreadWhereInput, orderBy: ThreadOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Thread!]
+  followers(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type VtuberConnection {
+  pageInfo: PageInfo!
+  edges: [VtuberEdge]!
+  aggregate: AggregateVtuber!
+}
+
+input VtuberCreateInput {
+  name: String!
+  image: String!
+  channelId: String!
+  threads: ThreadCreateManyWithoutVtuberInput
+  followers: UserCreateManyWithoutFollowsInput
+}
+
+input VtuberCreateManyWithoutFollowersInput {
+  create: [VtuberCreateWithoutFollowersInput!]
+  connect: [VtuberWhereUniqueInput!]
+}
+
+input VtuberCreateOneWithoutThreadsInput {
+  create: VtuberCreateWithoutThreadsInput
+  connect: VtuberWhereUniqueInput
+}
+
+input VtuberCreateWithoutFollowersInput {
+  name: String!
+  image: String!
+  channelId: String!
+  threads: ThreadCreateManyWithoutVtuberInput
+}
+
+input VtuberCreateWithoutThreadsInput {
+  name: String!
+  image: String!
+  channelId: String!
+  followers: UserCreateManyWithoutFollowsInput
+}
+
+type VtuberEdge {
+  node: Vtuber!
+  cursor: String!
+}
+
+enum VtuberOrderByInput {
+  id_ASC
+  id_DESC
+  name_ASC
+  name_DESC
+  image_ASC
+  image_DESC
+  channelId_ASC
+  channelId_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type VtuberPreviousValues {
+  id: ID!
+  name: String!
+  image: String!
+  channelId: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type VtuberSubscriptionPayload {
+  mutation: MutationType!
+  node: Vtuber
+  updatedFields: [String!]
+  previousValues: VtuberPreviousValues
+}
+
+input VtuberSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: VtuberWhereInput
+  AND: [VtuberSubscriptionWhereInput!]
+  OR: [VtuberSubscriptionWhereInput!]
+  NOT: [VtuberSubscriptionWhereInput!]
+}
+
+input VtuberUpdateInput {
+  name: String
+  image: String
+  channelId: String
+  threads: ThreadUpdateManyWithoutVtuberInput
+  followers: UserUpdateManyWithoutFollowsInput
+}
+
+input VtuberUpdateManyWithoutFollowersInput {
+  create: [VtuberCreateWithoutFollowersInput!]
+  delete: [VtuberWhereUniqueInput!]
+  connect: [VtuberWhereUniqueInput!]
+  disconnect: [VtuberWhereUniqueInput!]
+  update: [VtuberUpdateWithWhereUniqueWithoutFollowersInput!]
+  upsert: [VtuberUpsertWithWhereUniqueWithoutFollowersInput!]
+}
+
+input VtuberUpdateOneRequiredWithoutThreadsInput {
+  create: VtuberCreateWithoutThreadsInput
+  update: VtuberUpdateWithoutThreadsDataInput
+  upsert: VtuberUpsertWithoutThreadsInput
+  connect: VtuberWhereUniqueInput
+}
+
+input VtuberUpdateWithoutFollowersDataInput {
+  name: String
+  image: String
+  channelId: String
+  threads: ThreadUpdateManyWithoutVtuberInput
+}
+
+input VtuberUpdateWithoutThreadsDataInput {
+  name: String
+  image: String
+  channelId: String
+  followers: UserUpdateManyWithoutFollowsInput
+}
+
+input VtuberUpdateWithWhereUniqueWithoutFollowersInput {
+  where: VtuberWhereUniqueInput!
+  data: VtuberUpdateWithoutFollowersDataInput!
+}
+
+input VtuberUpsertWithoutThreadsInput {
+  update: VtuberUpdateWithoutThreadsDataInput!
+  create: VtuberCreateWithoutThreadsInput!
+}
+
+input VtuberUpsertWithWhereUniqueWithoutFollowersInput {
+  where: VtuberWhereUniqueInput!
+  update: VtuberUpdateWithoutFollowersDataInput!
+  create: VtuberCreateWithoutFollowersInput!
+}
+
+input VtuberWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  image: String
+  image_not: String
+  image_in: [String!]
+  image_not_in: [String!]
+  image_lt: String
+  image_lte: String
+  image_gt: String
+  image_gte: String
+  image_contains: String
+  image_not_contains: String
+  image_starts_with: String
+  image_not_starts_with: String
+  image_ends_with: String
+  image_not_ends_with: String
+  channelId: String
+  channelId_not: String
+  channelId_in: [String!]
+  channelId_not_in: [String!]
+  channelId_lt: String
+  channelId_lte: String
+  channelId_gt: String
+  channelId_gte: String
+  channelId_contains: String
+  channelId_not_contains: String
+  channelId_starts_with: String
+  channelId_not_starts_with: String
+  channelId_ends_with: String
+  channelId_not_ends_with: String
+  threads_every: ThreadWhereInput
+  threads_some: ThreadWhereInput
+  threads_none: ThreadWhereInput
+  followers_every: UserWhereInput
+  followers_some: UserWhereInput
+  followers_none: UserWhereInput
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  AND: [VtuberWhereInput!]
+  OR: [VtuberWhereInput!]
+  NOT: [VtuberWhereInput!]
+}
+
+input VtuberWhereUniqueInput {
+  id: ID
+  channelId: String
 }

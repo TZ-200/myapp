@@ -1,8 +1,8 @@
-import Index from '../components/Index'
+import Threads from '../components/Threads'
 
 const Home = props => (
     <div>
-        <Index/>
+        <Threads page={parseFloat(props.query.page) || 1}/>
     </div>
 )
 

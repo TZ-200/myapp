@@ -17,6 +17,9 @@ const Query = {
     comments: forwardTo('db'),
     thread: forwardTo('db'),
     threadsConnection: forwardTo('db'),
+    vtubersConnection: forwardTo('db'),
+    vtubers: forwardTo('db'),
+    vtuber: forwardTo('db'),
 
     me(parent, args, ctx, info) {
         // check if there is a current user id (middlewareでuserIdがrequestに付加されているかチェック)
@@ -30,7 +33,14 @@ const Query = {
         }, info)
     },
 
-
+    // followingThreads(parent, args, ctx, info) {
+    //     if(!ctx.request.userId){
+    //         return null
+    //     }
+    //     return ctx.db.query.threads({
+    //         where
+    //     })
+    // }
 
     // async order(parent, args, ctx, info){
     //     // Make sure they are logged in 

@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import { Mutation } from 'react-apollo'
 import Error from './ErrorMessage'
-import Router from 'next/router'
-import { CREATE_THREAD, THREADS_QUERY, SINGLE_VTUBER_QUERY } from './GQL'
-import { threadPerPage } from '../config';
+import { CREATE_VTUBER } from './GQL'
 
-class CreateThread extends Component {
+class CreateVtuber extends Component {
     
     state = {}
 
@@ -15,7 +13,7 @@ class CreateThread extends Component {
         this.setState({ [name]: val})
     }
 
-    createThread = async (e, createThread) => {
+    createVtuber = async (e, createVtuber) => {
         e.preventDefault()
         // Upload an Image to cloudinary
         const data = new FormData()
@@ -29,7 +27,7 @@ class CreateThread extends Component {
         await this.setState({
             image: file.secure_url,
         })
-        const response = await createThread()
+        const response = await createVtuber()
         return response
     }
 
@@ -49,57 +47,53 @@ class CreateThread extends Component {
   render() {
     return (
         <Mutation 
-            mutation={CREATE_THREAD}
+            mutation={CREATE_VTUBER}
             variables={{
-                title: this.state.title,    // imagePreviewUrlが重すぎてエラーを吐くので、含めないようにわざわざvariablesを指定している
-                text: this.state.text,
+                name: this.state.name,    // imagePreviewUrlが重すぎてエラーを吐くので、含めないようにわざわざvariablesを指定している
                 image: this.state.image,
-                vtuber: this.props.id
+                channelId: this.state.channelId,
             }}
-            refetchQueries={() => {     // これでキャッシュ内のデータが更新されるのでリロードしなくて済む
-                return[{
-                    query : SINGLE_VTUBER_QUERY,
-                    variables: {
-                        id: this.props.id
-                     }
-                }]
-            }}
+            // refetchQueries={() => {     // これでキャッシュ内のデータが更新されるのでリロードしなくて済む
+            //     return[{
+            //         query : THREADS_QUERY,
+            //         variables: {
+            //             skip: this.props.page * threadPerPage - threadPerPage,
+            //             first: threadPerPage 
+            //          }
+            //     }]
+            // }}
         >
-            {(createThread, { loading, error }) => (
+            {(createVtuber, { loading, error }) => (
 
                 <form 
                     method="post" 
                     onSubmit={ async e => {
                         e.preventDefault()
-                        const res = await this.createThread(e, createThread)
-                        Router.push({
-                            pathname: '/thread',
-                            query: { id: res.data.createThread.id }
-                        })
+                        const res = await this.createVtuber(e, createVtuber)
                     }}
                 >
                 <Error error={error} /> 
 
                 <fieldset disabled={loading} aria-busy={loading}>
-                    <label htmlFor="title">
-                        Title
+                    <label htmlFor="name">
+                        Name
                         <input 
                             type="text" 
-                            id="title" 
-                            name="title" 
-                            placeholder="Title" 
+                            id="name" 
+                            name="name" 
+                            placeholder="name" 
                             required 
                             onChange={this.handleChange} 
                         />
                     </label>
                 
-                    <label htmlFor="text">
-                        Text
+                    <label htmlFor="channelId">
+                        ChannelId
                         <input 
                             type="text" 
-                            id="text" 
-                            name="text" 
-                            placeholder="text" 
+                            id="channelId" 
+                            name="channelId" 
+                            placeholder="channelId" 
                             required 
                             onChange={this.handleChange} 
                         />
@@ -116,7 +110,7 @@ class CreateThread extends Component {
                         {this.state.imagePreviewUrl && <img width="200" height="200" id="preview" style={{objectFit:'cover'}} src={this.state.imagePreviewUrl} alt="Upload Preview"/> }
                     </label>
 
-                    <button type="submit">投稿</button>
+                    <button type="submit">申請</button>
                 </fieldset>
                 </form>
             )}
@@ -125,4 +119,4 @@ class CreateThread extends Component {
   }
 }
 
-export default CreateThread
+export default CreateVtuber
