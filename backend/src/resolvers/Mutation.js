@@ -222,6 +222,7 @@ const Mutations = {
         if(!ctx.request.userId){
             throw new Error('You must be logged in to do that!')
         }
+
         let data = {
             author: {
                 connect: {
@@ -234,10 +235,12 @@ const Mutations = {
                 }
             },
             text: args.text,
+            depth: 0
         }
 
         if(args.reply){
-            data = { ...data, reply:{connect:{id: args.reply}}}
+            const parentComment = await ctx.db.query.comment({ where: {id: args.reply}})
+            data = { ...data, reply:{connect:{id: args.reply}}, depth: parentComment.depth + 1}
         }
 
         const comment = await ctx.db.mutation.createComment({ data }, info)

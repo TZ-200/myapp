@@ -22,7 +22,7 @@ class Comment extends Component {
         const comment = this.props.comment
         return (
             <div>
-                {comment.text} by {comment.author.name} & Upvote:{this.state.upvotes}
+                {comment.reply && 'Reply '} {comment.text} by {comment.author.name} & Upvote:{this.state.upvotes} || depth:{comment.depth}
                 <User>
                     {({data: { me }}) => {
                         if(me){

@@ -207,6 +207,10 @@ const SINGLE_THREAD_QUERY = gql`
                         id
                     }
                 }
+                reply{
+                    id
+                }
+                depth
             }
         }
     }

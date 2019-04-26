@@ -31,6 +31,7 @@ type Comment {
   thread: Thread!
   upvotes(where: UpvoteWhereInput, orderBy: UpvoteOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Upvote!]
   reply: Comment
+  depth: Int!
 }
 
 type CommentConnection {
@@ -45,6 +46,7 @@ input CommentCreateInput {
   thread: ThreadCreateOneWithoutCommentsInput!
   upvotes: UpvoteCreateManyWithoutCommentInput
   reply: CommentCreateOneInput
+  depth: Int!
 }
 
 input CommentCreateManyWithoutAuthorInput {
@@ -72,6 +74,7 @@ input CommentCreateWithoutAuthorInput {
   thread: ThreadCreateOneWithoutCommentsInput!
   upvotes: UpvoteCreateManyWithoutCommentInput
   reply: CommentCreateOneInput
+  depth: Int!
 }
 
 input CommentCreateWithoutThreadInput {
@@ -79,6 +82,7 @@ input CommentCreateWithoutThreadInput {
   author: UserCreateOneWithoutCommentsInput!
   upvotes: UpvoteCreateManyWithoutCommentInput
   reply: CommentCreateOneInput
+  depth: Int!
 }
 
 input CommentCreateWithoutUpvotesInput {
@@ -86,6 +90,7 @@ input CommentCreateWithoutUpvotesInput {
   author: UserCreateOneWithoutCommentsInput!
   thread: ThreadCreateOneWithoutCommentsInput!
   reply: CommentCreateOneInput
+  depth: Int!
 }
 
 type CommentEdge {
@@ -102,6 +107,8 @@ enum CommentOrderByInput {
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
+  depth_ASC
+  depth_DESC
 }
 
 type CommentPreviousValues {
@@ -109,6 +116,7 @@ type CommentPreviousValues {
   text: String!
   createdAt: DateTime!
   updatedAt: DateTime!
+  depth: Int!
 }
 
 type CommentSubscriptionPayload {
@@ -135,6 +143,7 @@ input CommentUpdateDataInput {
   thread: ThreadUpdateOneRequiredWithoutCommentsInput
   upvotes: UpvoteUpdateManyWithoutCommentInput
   reply: CommentUpdateOneInput
+  depth: Int
 }
 
 input CommentUpdateInput {
@@ -143,6 +152,7 @@ input CommentUpdateInput {
   thread: ThreadUpdateOneRequiredWithoutCommentsInput
   upvotes: UpvoteUpdateManyWithoutCommentInput
   reply: CommentUpdateOneInput
+  depth: Int
 }
 
 input CommentUpdateManyWithoutAuthorInput {
@@ -184,6 +194,7 @@ input CommentUpdateWithoutAuthorDataInput {
   thread: ThreadUpdateOneRequiredWithoutCommentsInput
   upvotes: UpvoteUpdateManyWithoutCommentInput
   reply: CommentUpdateOneInput
+  depth: Int
 }
 
 input CommentUpdateWithoutThreadDataInput {
@@ -191,6 +202,7 @@ input CommentUpdateWithoutThreadDataInput {
   author: UserUpdateOneRequiredWithoutCommentsInput
   upvotes: UpvoteUpdateManyWithoutCommentInput
   reply: CommentUpdateOneInput
+  depth: Int
 }
 
 input CommentUpdateWithoutUpvotesDataInput {
@@ -198,6 +210,7 @@ input CommentUpdateWithoutUpvotesDataInput {
   author: UserUpdateOneRequiredWithoutCommentsInput
   thread: ThreadUpdateOneRequiredWithoutCommentsInput
   reply: CommentUpdateOneInput
+  depth: Int
 }
 
 input CommentUpdateWithWhereUniqueWithoutAuthorInput {
@@ -283,6 +296,14 @@ input CommentWhereInput {
   upvotes_some: UpvoteWhereInput
   upvotes_none: UpvoteWhereInput
   reply: CommentWhereInput
+  depth: Int
+  depth_not: Int
+  depth_in: [Int!]
+  depth_not_in: [Int!]
+  depth_lt: Int
+  depth_lte: Int
+  depth_gt: Int
+  depth_gte: Int
   AND: [CommentWhereInput!]
   OR: [CommentWhereInput!]
   NOT: [CommentWhereInput!]

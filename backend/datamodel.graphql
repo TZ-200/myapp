@@ -52,6 +52,7 @@ type Comment {
   thread: Thread! @relation(name: "CommentToThread", onDelete: SET_NULL)
   upvotes: [Upvote!] @relation(name: "UpvoteToComment", onDelete: CASCADE)
   reply: Comment
+  depth: Int!
 }
 
 type Upvote {
