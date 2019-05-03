@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Mutation } from 'react-apollo'
-import { CREATE_UPVOTE, SINGLE_THREAD_QUERY, DELETE_UPVOTE_MUTATION } from './GQL'
+import { CREATE_UPVOTE, SINGLE_THREAD_QUERY, DELETE_UPVOTE_MUTATION, COMMENT_QUERY, UPDATE_UPVOTE } from './GQL'
 
 
 class UpdateUpvote extends Component {
@@ -9,80 +9,91 @@ class UpdateUpvote extends Component {
 
     componentDidMount(){
         const userId = this.props.userId
-        const upvote = this.props.comment.upvotes.filter(upvote => upvote.author.id === userId)
-        const upvoted = upvote.length !== 0
+        const upvote = this.props.comment.upvotes.filter(upvote => upvote.author.id === userId) // lengthは 0 か 1
+        const upvoted = upvote.length !== 0 // ユーザがいいねしてたらtrue
         this.setState({upvoted})
-        upvote.length > 0 ? this.setState({ upvoteId: upvote[0].id }) : this.setState({ upvoteId: null })
+
+        // lengthが1、つまりユーザがいいねしてたら、そのいいねのidを取得
+        // いいねしてなかったらそのidはnull
+        upvote.length > 0 
+            ? this.setState({ upvoteId: upvote[0].id }) 
+            : this.setState({ upvoteId: null })  
+            
     }
-
-    // update = (cache, payload) => {
-    //     const data = cache.readQuery({ 
-    //         query: SINGLE_THREAD_QUERY,
-    //         variables: {
-    //             id: payload.data.createUpvote.thread.id
-    //         }
-    //     })
-    //     console.log(data);
-
-    // }
 
     render() {        
         return (
-            <Mutation
-                mutation={DELETE_UPVOTE_MUTATION}
-                variables={{
-                    id: this.state.upvoteId
-                }}
-            >
-                {(deleteUpvote, {loading, error}) => {
-                    const deleteLoading = loading 
-                    return(
-
                     <Mutation
-                        mutation={CREATE_UPVOTE}
+                        mutation={UPDATE_UPVOTE}
                         variables={{
                             author: this.props.comment.author,
                             Comment: this.props.comment.id
                         }}
+                        refetchQueries={() => {
+                            return[{
+                                query: SINGLE_THREAD_QUERY,
+                                variables: { id: this.props.threadId }
+                            }]
+                        }}
                     >
 
-                    {(createUpvote, {loading, error}) =>(
-                        <button
+                    {(updateUpvote, {loading, error}) =>(
+
+                        // <svg
+                        //     onClick={() => {
+                        //         if(!this.state.upvoted){
+                        //             createUpvote()
+                        //             .then(() => this.props.toUpvote() )
+                        //             .catch(err => {
+                        //                 alert(err.message)
+                        //             })
+                        //         } else {
+                        //             deleteUpvote()
+                        //             .then(() => this.props.toDeleteUpvote())
+                        //             .catch(err => {
+                        //                 alert(err.message)
+                        //             })
+                        //         }
+                        //     }}
+                        //     style={{
+                        //         fill: this.state.upvoted ? '#3b7ab8' : '#777',
+                        //         cursor: 'pointer',
+                        //         pointerEvents: (loading || deleteLoading) ? 'none' : 'auto',
+                        //         width: '17px',
+                        //         height: '17px'
+                        //     }}
+                        // >
+                        
+                        //     <use xlinkHref="../static/like.svg#Layer_1"></use>
+                        // </svg>
+
+                        <div
                             onClick={() => {
-                                if(!this.state.upvoted){
-                                    createUpvote()
-                                    .then((payload) => {
-                                        this.setState({ 
-                                            upvoted: true,
-                                            upvoteId: payload.data.createUpvote.id
-                                        })
+                                updateUpvote()
+                                .then(() => {
+                                    if(!this.state.upvoted){
                                         this.props.toUpvote()
-                                    })
-                                    .catch(err => {
-                                        alert(err.message)
-                                    })
-                                } else {
-                                    deleteUpvote()
-                                    .then(() => {
-                                        this.setState({ 
-                                            upvoted: false,
-                                            upvoteId: null 
-                                        })
+                                    } else {
                                         this.props.toDeleteUpvote()
-                                    })
-                                    .catch(err => {
-                                        alert(err.message)
-                                    })
-                                }
+                                    }
+                                })
+                                .catch(err => {
+                                    alert(err.message)
+                                })
                             }}
-                            disabled={loading || deleteLoading}    
+                            style={{
+                                pointerEvents: loading ? 'none' : 'auto',
+                                color: this.state.upvoted ? '#3b7ab8' : '#777',
+                                cursor: 'pointer',
+                                fontWeight: this.state.upvoted ? '600' : '300',
+                            }}
                         >
-                            {this.state.upvoted ? 'いいね済' : 'いいね未'}
-                        </button>
+                        いいね({this.props.upvotes})
+                        </div>
+
                     )}
                     </Mutation>
-                )}}
-            </Mutation>
+
         );
     }
 }

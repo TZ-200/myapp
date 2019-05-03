@@ -1,28 +1,26 @@
 import Link from 'next/link'
 import User from './User'
 import Signout from './Signout'
+import NavStyles from './styles/NavStyles'
 
 const Nav = () => (
     <User>
         {({data: { me }}) => (
-            <React.Fragment>
-                <Link href="/">
-                    <a>All</a>
-                </Link>
-
+            <NavStyles>
+                <Link href="/threads">
+                    <a>ホーム</a>
+                </Link> 
                 { me && (
                     <React.Fragment>
-                        <Link href="/threads">
-                            <a>Home</a>
-                        </Link>    
-                        <Link href="/account">
-                            <a>Account</a>
-                        </Link>
-                        <Link href="/register">
-                            <a>Register</a>
-                        </Link>
+ 
                         <Link href="/vtubers">
-                            <a>Vtubers</a>
+                            <a>Vtuber一覧</a>
+                        </Link>  
+                        <Link href="/register">
+                            <a>チャンネル登録</a>
+                        </Link>
+                        <Link href="/account">
+                            <a>アカウント</a>
                         </Link>
                         <Signout/>
                     </React.Fragment>
@@ -33,7 +31,7 @@ const Nav = () => (
                         <a>Sign up</a>
                     </Link>
                 )}
-            </React.Fragment>
+            </NavStyles>
         )}
     </User>       
 )

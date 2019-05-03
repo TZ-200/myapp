@@ -19,6 +19,7 @@ const THREADS_QUERY = gql`
         ){
             id
             title
+            text
             image
             comments{
                 id
@@ -26,11 +27,25 @@ const THREADS_QUERY = gql`
             vtuber{
                 id
                 name
+                image
             }
         }
     }
 `
 
+const COMMENT_QUERY = gql`
+    query COMMENT_QUERY(
+        $commentId: ID!
+    ){
+        comments (
+            where: {
+                id: $commentId
+            }
+        ){
+            id   
+        }
+    }
+`
 
 const VTUBERS_QUERY = gql`
     query VTUBERS_QUERY(
@@ -136,6 +151,7 @@ const CURRENT_USER_QUERY = gql`
             follows{
                 id
                 name
+                image
             }
             Threads{
                 id
@@ -193,6 +209,8 @@ const SINGLE_THREAD_QUERY = gql`
             vtuber{
                 id
                 name
+                image
+                channelId
             }
             comments{
                 id
@@ -261,6 +279,22 @@ const CREATE_COMMENT = gql`
     }
 `
 
+const UPDATE_UPVOTE = gql`
+    mutation UPDATE_UPVOTE(
+        $author: ID!
+        $Comment: ID!
+    ){
+        updateUpvote(
+            authorId: $author
+            commentId: $Comment
+        ){
+            id
+            Comment{
+                id
+            }
+        }
+    }
+`
 
 const CREATE_UPVOTE = gql`
     mutation CREATE_UPVOTE(
@@ -386,6 +420,7 @@ const PAGINATION_VTUBERS_QUERY = gql`
 
 export { 
     THREADS_QUERY, 
+    COMMENT_QUERY,
     CREATE_THREAD, SIGNUP, 
     CURRENT_USER_QUERY,
     SIGNOUT_MUTATION, 
@@ -396,6 +431,7 @@ export {
     DELETE_THREAD_MUTATION,
     UPDATE_THREAD_MUTATION,
     CHECK_THREAD_PERMISSION_MUTATION,
+    UPDATE_UPVOTE,
     CREATE_UPVOTE,
     DELETE_UPVOTE_MUTATION,
     PAGINATION_QUERY,

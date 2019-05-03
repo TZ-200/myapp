@@ -7,6 +7,12 @@ import Comment from './Comment'
 import User from './User'
 import CheckUpdateThread from './CheckUpdateThread'
 import flatten from '../lib/flatten'
+import ThreadDetailStyles from './styles/ThreadDetailStyles'
+import CreateFollow from './CreateFollow'
+import AccountOnThreadsStyles from './styles/AccountOnThreadsStyles'
+import SignupReco from './styles/SignupReco'
+import Link from 'next/link'
+import uniqid from 'uniqid'
 
 class Thread extends Component {
 
@@ -48,31 +54,101 @@ class Thread extends Component {
                             },[]).reverse();  
                             
                             return(
-                                <React.Fragment>
-                                <h2>Title: {thread.title} Text: {thread.text} Vtuber:{thread.vtuber.name}</h2>
-                                <p>{thread.image && <img width="200" height="200" style={{objectFit:'cover'}} src={thread.image} alt="Thread Image"/>}</p>
                                 <User>
-                                    {({data: { me }}) => (
-                                        <React.Fragment>
-                                            { me && <CheckUpdateThread threadId={thread.id}/> }
-                                        </React.Fragment>
-                                    )}
-                                </User> 
+                                {({data: { me }}) => (
 
-                                <CreateComment  thread={this.props.id} />
+                                <ThreadDetailStyles>
 
-                                {comments && nestedComments.map(comment => {
-                                    const flatComments = flatten(comment)
-                                    const dispComments = flatComments.map(flatComment => <Comment threadId={this.props.id} comment={flatComment} key={flatComment.id}/>)
-                                    return dispComments
-                                })}
+                                <div>
+                                    <div></div>
+                                    <img src={thread.vtuber.image}/>
+                                    <div className="thread__vtuberHead--name">{thread.vtuber.name}</div>
+                                    { me && <CreateFollow vtuberId={thread.vtuber.id}/>}
+                                    
+                                    <a href={`https://www.youtube.com/channel/${thread.vtuber.channelId}`}>
+                                        <svg>
+                                            <use xlinkHref="../static/youtube-logotype.svg#Capa_1"></use>
+                                        </svg>
+                                    </a>
+
+                                    </div>
                                 
-                                </React.Fragment>
+                                <div>
+                                    <div>
+                                        <div className="thread__detail--title">{thread.title}</div>
+                                        <div  className="thread__detail--meta">投稿日　　投稿者　　{ me && <CheckUpdateThread threadId={thread.id}/> }</div>
+                                        <img className="thread__detail--image" src={thread.image}/>
+                                        <div className="thread__detail--text">{thread.text.split("\n").map(el => <span key={uniqid()}>{el}<br/></span>)}</div>
+                                        <div className="thread__detail--mainCreateComment">
+                                            <CreateComment  thread={this.props.id} />
+                                        </div>
+                                        <div className="thread__detail--comments">
+                                            {comments && nestedComments.map(comment => {
+                                                const flatComments = flatten(comment)
+                                                const dispComments = flatComments.map(flatComment => <Comment threadId={this.props.id} comment={flatComment} key={flatComment.id}/>)
+                                                return dispComments
+                                            })}
+                                        </div>
+                                    </div>
+                                    { me ? 
+                                        (
+                                            <AccountOnThreadsStyles>
+                                                <img src={me.image}  width="100" height="100" />
+                                                <div>{me.name}</div>
+                                                    <Link 
+                                                            href={{
+                                                                pathname: '/post',
+                                                                query: { id: thread.vtuber.id },
+                                                            }}
+                                                        >
+                                                        <a><div className='thread__post'>スレッド投稿</div></a>
+                                                    </Link>    
+                                            </AccountOnThreadsStyles>
+                                        ) : (
+                                            <SignupReco>
+                                                <div>スレッドの投稿 / Vtuberの登録にはユーザ登録が必要となります</div>
+                                                <div>ユーザ登録</div>
+                                            </SignupReco>
+                                        )
+                                    }
+                                </div>
+                                
+                                </ThreadDetailStyles>
+                                )}
+                                </User>
                             )
                         }}
                     </Query>
         );
     }
 }
+
+
+/**
+ * 
+ * 
+ * 
+ * 
+<h2>Title: {thread.title} Text: {thread.text} Vtuber:{thread.vtuber.name}</h2>
+<p>{thread.image && <img  src={thread.image} alt="Thread Image"/>}</p>
+<User>
+    {({data: { me }}) => (
+        <React.Fragment>
+            { me && <CheckUpdateThread threadId={thread.id}/> }
+        </React.Fragment>
+    )}
+</User> 
+
+<CreateComment  thread={this.props.id} />
+
+{comments && nestedComments.map(comment => {
+    const flatComments = flatten(comment)
+    const dispComments = flatComments.map(flatComment => <Comment threadId={this.props.id} comment={flatComment} key={flatComment.id}/>)
+    return dispComments
+})}
+
+
+ * 
+ */
 
 export default Thread;

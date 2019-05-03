@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import styled, { ThemeProvider, injectGlobal } from 'styled-components'
 import Header from './Header'
+import Footer from './Footer'
 import Meta from './Meta';
+import { auto } from 'async';
 /**
  * React context apiを使用することで他の子コンポーネントで流用できる（propとしてpassする必要がない）
  * CSS なので '' で囲う必要がある
@@ -12,7 +14,7 @@ const theme = {
     grey: '#3A3A3A',
     lightgrey: '#E1E1E1',
     offWhite: '#EDEDED',
-    maxWidth: '1000px',
+    maxWidth: '1084px',
     bs: '0 12px 24px 0 rgba(0, 0, 0, 0.09)',
 }
 
@@ -25,7 +27,6 @@ const StyledPage = styled.div`
 const Inner = styled.div`
     max-width: ${props => props.theme.maxWidth};
     margin: 0 auto;
-    padding: 2rem;
 `
 
 // injectGlobalはThemeProviderの外にあるので${props => props.theme.black}みたいなのはできない
@@ -46,9 +47,9 @@ injectGlobal`
     body {
         padding: 0;
         margin: 0;
-        font-size: 1.5rem;
-        line-height: 2;
-        font-family: 'radnika_next';    
+        font-size: 62.5%;
+        line-height: 1.6;
+        font-family: 'メイリオ', sans-serif;   
     }
     a {
         text-decoration: none;
@@ -56,14 +57,27 @@ injectGlobal`
     }
 `
 
+const styles = {
+    contents: {
+        display: 'grid',
+        backgroundColor: '#eeeeee',
+        margin: 'auto',
+        gridTemplateRows: '30px 1fr 60px',
+        position: 'relative'
+    }
+}
+
 class Page extends Component {
     render() {
         return (
             <ThemeProvider theme={theme}>
                 <StyledPage>
                     <Meta/>
-                    <Header/>
-                    <Inner>{this.props.children}</Inner>
+                    <div className="contents" style={styles.contents}>
+                        <Header/>
+                        <Inner>{this.props.children}</Inner>
+                        <Footer />
+                    </div>
                 </StyledPage>
             </ThemeProvider>
         );

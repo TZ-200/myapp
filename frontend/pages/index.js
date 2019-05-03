@@ -1,8 +1,8 @@
-import Threads from '../components/Threads'
+import FollowingThreads from '../components/FollowingThreads'
 
 const Home = props => (
     <div>
-        <Threads page={parseFloat(props.query.page) || 1}/>
+        <FollowingThreads page={parseFloat(props.query.page) || 1}/>
     </div>
 )
 

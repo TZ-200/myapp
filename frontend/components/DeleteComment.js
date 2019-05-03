@@ -19,7 +19,7 @@ class DeleteComment extends Component {
                 }}
             >
             {(deleteComment, {error})=>(
-                <button
+                <div
                     onClick={() => {
                         if(confirm('Are you sure you want to delete this item?')){
                             deleteComment()
@@ -28,9 +28,10 @@ class DeleteComment extends Component {
                             })
                         }
                     }}
+                    style={{cursor: 'pointer'}}
                 >
-                    x
-                </button>
+                    削除
+                </div>
             )}
             
             </Mutation>

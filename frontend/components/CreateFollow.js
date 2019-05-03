@@ -2,11 +2,44 @@ import React, { Component } from 'react';
 import { Mutation } from 'react-apollo'
 import { CREATE_FOLLOW, DELETE_FOLLOW, CURRENT_USER_QUERY } from './GQL'
 import User from './User'
+import styled from 'styled-components';
+
 
 class CreateFollow extends Component {
     render() {
+        const FollowButtonStyles = styled.div`
+            & .followed__btn{
+                background-color: #3b7ab8;
+                border-radius: 5px;
+                border: none;
+                color: #fff;
+                cursor: pointer;
+                font-size: 10px;
+                padding: 4px 8px;
+                width: 80px;
+                 &:hover{
+                     background-color: #c53e3e;
+                 }
+            }
+
+            & .follow__btn{
+                background-color: #fff;
+                border-radius: 5px;
+                border: 1px solid #3b7ab8;
+                color: #3b7ab8;
+                cursor: pointer;
+                font-size: 10px;
+                padding: 4px 8px;
+                width: 80px;
+                font-weight: 600;
+                 &:hover{
+                     background-color: #eef4fb;
+                 }
+            }
+    
+        `
         return (
-            <div>
+            <FollowButtonStyles>
                 <User>
                     {({data: { me }}) => {
                         const isFollowing = me.follows.some(follow => follow.id === this.props.vtuberId)
@@ -27,6 +60,7 @@ class CreateFollow extends Component {
                                     }}
                                 >
                                     {(deleteFolow, { loading, error }) => (
+                                        
                                         <button
                                             onClick={() => {
                                                 deleteFolow()
@@ -35,8 +69,11 @@ class CreateFollow extends Component {
                                                 })
                                             }}
                                             disabled={loading}
+                                            className="followed__btn"
+                                            onMouseOver={(e) => e.target.innerHTML='フォロー解除' }
+                                            onMouseOut={(e) => e.target.innerHTML='フォロー中'}
                                         >
-                                            unfollow
+                                            フォロー中
                                         </button>
                                     )}
                                 </Mutation>
@@ -62,8 +99,9 @@ class CreateFollow extends Component {
                                                 })
                                             }}
                                             disabled={loading}
+                                            className="follow__btn"
                                         >
-                                            follow
+                                            フォローする
                                         </button>
                                     )}
                                 </Mutation>
@@ -72,7 +110,7 @@ class CreateFollow extends Component {
                         )
                     }}
                 </User>
-            </div>
+            </FollowButtonStyles>
         );
     }
 }

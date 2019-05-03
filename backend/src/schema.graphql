@@ -19,6 +19,7 @@ type Mutation {
     deleteThread(id: ID!): Thread!
     createComment(text: String!, thread: ID!, reply: ID): Comment!
     deleteComment(id: ID!): Comment!
+    updateUpvote(authorId: ID!, commentId: ID!): Upvote!
     createUpvote(authorId: ID!, commentId: ID!): Upvote!
     deleteUpvote(id: ID!): Upvote!
     updateUser(name: String, description: String, image: String): User!

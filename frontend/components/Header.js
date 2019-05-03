@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Nav from './Nav'
 import Router from 'next/router'
 import Nprogress from 'nprogress'
+import HeaderStyles from './styles/HeaderStyles'
 
 Router.onRouteChangeStart = () => {
     Nprogress.start()
@@ -14,18 +15,14 @@ Router.onRouteChangeError = () => {
 }
 
 const Header = () => (
-    <div>
+    <HeaderStyles>
+        <div>
             <Link href="/">
-                <a>CC</a>
+                <a>VTBASE</a>
             </Link>    
-        <Nav/>
-
-    </div>
-
-
-            
-        
-
+            <Nav/>
+        </div>
+    </HeaderStyles>
 )
 
 export default Header

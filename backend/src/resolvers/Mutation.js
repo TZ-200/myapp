@@ -219,14 +219,24 @@ const Mutations = {
     },
 
     async createComment(parent, args, ctx, info) {
-        if(!ctx.request.userId){
-            throw new Error('You must be logged in to do that!')
+        
+        let userId = ctx.request.userId 
+        if(!userId){
+            userId = "cjv7dwake87q90b12p4g7kcbk"
+            
+            /**ログインしてない人のコメント用アカウント
+             * name: 名無しさん
+             * email: nanashi@nanashi
+             * pass: afgerlnag;lban;giarnjgbo;arjg;aejer;eioan
+             */
+
         }
+
 
         let data = {
             author: {
                 connect: {
-                    id: ctx.request.userId
+                    id: userId
                 }
             },
             thread: {
@@ -268,7 +278,13 @@ const Mutations = {
             throw new Error("You don't have permission to do that!")
         }
         // delete it
-        return ctx.db.mutation.deleteComment({ where }, info)
+        return ctx.db.mutation.updateComment({ 
+            where,
+            data:{
+                text: "この投稿は削除されました",
+
+            }
+        }, info)
     },
 
 
@@ -308,6 +324,53 @@ const Mutations = {
         return { message: 'OK, you have permisssssssioooooon!'}
     },
 
+    async updateUpvote(parent, args, ctx, info) {
+        if(!ctx.request.userId){
+            throw new Error('You must be logged in to do that!')
+        }
+
+        const upvote = await ctx.db.query.upvotes({
+            where:{
+                AND: [
+                    {
+                        author: {
+                            id: ctx.request.userId
+                        }
+                    },{
+                        Comment: {
+                            id: args.commentId
+                        }
+                    }
+                ]
+            }
+        }, info)
+
+        if(upvote.length > 0 ) {
+            return ctx.db.mutation.deleteUpvote({ 
+                where: {
+                    id: upvote[0].id
+                } 
+            }, info)
+        } else {
+            return ctx.db.mutation.createUpvote({
+                data:{
+                    author: {
+                        connect: {
+                            id: ctx.request.userId
+                        }
+                    },
+                    Comment: {
+                        connect: {
+                            id: args.commentId
+                        }
+                    },
+                }
+            }, info)
+        }
+    
+    },
+
+
     async createUpvote(parent, args, ctx, info) {
         if(!ctx.request.userId){
             throw new Error('You must be logged in to do that!')
@@ -336,6 +399,9 @@ const Mutations = {
 
 
     async deleteUpvote(parent, args, ctx, info) {
+        if(!ctx.request.userId){
+            throw new Error('You must be logged in to do that!')
+        }
         const where = { id: args.id }
         // find the comment
         // const upvote = await ctx.db.query.upvote({where}, `{id author { id }}`)
